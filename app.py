@@ -1,5 +1,3 @@
-# Version - 6.1  (Code Updated of Checking for Non-matching Class number == GPT 4o mini)
-
 from fileinput import filename
 import time, os
 import streamlit as st
@@ -120,14 +118,7 @@ def extract_trademark_details_code1(
             },
         ]
         
-                # Example-5 output format: 
-                #     Trademark Name: PI\n
-                #     Status: REGISTERED\n
-                    
-        # Not available in the provided document
-        #  Example expected output format: Trademark Name: SLIK Status: PENDING FILED AS USE APPLICATION Serial Number: 98-602,112 International Class Number: 3 Owner: SLIK DE VENEZUELA C.A. VENEZUELA CORPORATION Goods & Services: Cosmetics; hair gel; hair wax; hair styling gel; non-medicated cosmetics Filed Date: JUN 14, 2024 Registration Number: Not available in the provided document.
-        #  Example expected output: Trademark Name: #WASONOFILTER Status: REGISTERED Serial Number: 88-404,432 International Class Number: 21 Owner: LAHC US 1 LLC DELAWARE LIMITED LIABILITY COMPANY Goods & Services:  Containers for household use, coffee mugs, and wine glasses Filed Date: APR 26, 2019 Registration Number: 5,963,355"""}
-
+               
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=messages,
@@ -136,8 +127,6 @@ def extract_trademark_details_code1(
         )
         extracted_text = response.choices[0].message.content
 
-        # if extracted_text and extracted_text != "[]":
-        # st.write(extracted_text)
 
         details = {}
         for line in extracted_text.split("\n"):
@@ -444,18 +433,7 @@ def parse_trademark_details(
                             "design_phrase", "No Design phrase presented in document"
                         )
 
-                        # If crucial fields are missing, attempt to re-extract the values
-
-                        # if not trademark_name or not owner or not status or not international_class_number:
-                        #     preprocessed_chunk = preprocess_text(data.get("raw_text", ""))
-                        #     extracted_data = extract_trademark_details_code1(preprocessed_chunk)
-                        #     trademark_name = extracted_data.get("trademark_name", trademark_name).split(',')[0].strip()
-                        #     if "Global Filings" in trademark_name:
-                        #         trademark_name = trademark_name.split("Global Filings")[0].strip()
-                        #     owner = extracted_data.get("owner", owner).split(',')[0].strip()
-                        #     status = extracted_data.get("status", status).split(',')[0].strip()
-                        #     international_class_number = parse_international_class_numbers(extracted_data.get("international_class_number", "")) or international_class_number
-                        #     registration_number = extracted_data.get("registration_number", registration_number).split(',')[0].strip()
+                        
 
                         trademark_details = TrademarkDetails(
                             trademark_name=trademark_name,
@@ -577,171 +555,7 @@ def compare_trademarks(
             >= threshold
         )
 
-    # def is_exact_match(name1: str, name2: str) -> bool:
-    #     # Initial exact match check
-    #     if name1.strip().lower() == name2.strip().lower():
-    #         return True
-    #     else:
-    #         # Check for near-exact matches using normalized forms
-    #         normalized_name1 = normalize_texts(name1)
-    #         normalized_name2 = normalize_texts(name2)
-    #         if normalized_name1 == normalized_name2:
-    #             return True
-    #         elif fuzz.ratio(normalized_name1, normalized_name2) >= 95:
-    #             # Near-exact match, supplement with LLM
-    #             return is_exact_match_llm(name1, name2)
-    #         else:
-    #             return False
-
-    # def normalize_texts(text: str) -> str:
-    #     import unicodedata
-    #     import re
-
-    #     # Normalize unicode characters
-    #     text = unicodedata.normalize("NFKD", text)
-    #     # Remove diacritics
-    #     text = "".join(c for c in text if not unicodedata.combining(c))
-    #     # Remove special characters and punctuation
-    #     text = re.sub(r"[^\w\s]", "", text)
-    #     # Convert to lowercase and strip whitespace
-    #     return text.lower().strip()
-
-    # def is_exact_match_llm(name1: str, name2: str) -> bool:
-    #     from openai import AzureOpenAI
-    #     import os
-
-    #     azure_endpoint = os.getenv("AZURE_ENDPOINT")
-    #     api_key = os.getenv("AZURE_API_KEY")
-    #     client = AzureOpenAI(
-    #         azure_endpoint=azure_endpoint,
-    #         api_key=api_key,
-    #         api_version="2024-10-01-preview",
-    #     )
-
-    #     prompt = f"""  
-    #         Are the following two trademark names considered exact matches, accounting for minor variations such as special characters, punctuation, or formatting? Respond with 'Yes' or 'No'.  
-            
-    #         Trademark Name 1: "{name1}"  
-    #         Trademark Name 2: "{name2}"  
-    #         """
-
-    #     messages = [
-    #         {
-    #             "role": "system",
-    #             "content": "You are a trademark expert specializing in name comparisons.",
-    #         },
-    #         {"role": "user", "content": prompt},
-    #     ]
-
-    #     response = client.chat.completions.create(
-    #         model="gpt-4o-mini",
-    #         messages=messages,
-    #         temperature=0.0,
-    #         max_tokens=5,
-    #     )
-
-    #     answer = response.choices[0].message.content.strip().lower()
-    #     return "yes" in answer.lower()
-
-    # def is_semantically_equivalents(
-    #     name1: str, name2: str, threshold: float = 0.80
-    # ) -> bool:
-    #     embeddings1 = semantic_model.encode(name1, convert_to_tensor=True)
-    #     embeddings2 = semantic_model.encode(name2, convert_to_tensor=True)
-    #     similarity_score = util.cos_sim(embeddings1, embeddings2).item()
-    #     if similarity_score >= threshold:
-    #         return True
-    #     elif similarity_score >= (threshold - 0.1):
-    #         # Near-threshold case, supplement with LLM
-    #         return is_semantically_equivalent_llm(name1, name2)
-    #     else:
-    #         return False
-
-    # def is_semantically_equivalent_llm(name1: str, name2: str) -> bool:
-    #     prompt = f"""  
-    #     Are the following two trademark names semantically equivalent? Respond with 'Yes' or 'No'.  
-        
-    #     Trademark Name 1: "{name1}"  
-    #     Trademark Name 2: "{name2}"  
-    #     """
-
-    #     azure_endpoint = os.getenv("AZURE_ENDPOINT")
-    #     api_key = os.getenv("AZURE_API_KEY")
-    #     client = AzureOpenAI(
-    #         azure_endpoint=azure_endpoint,
-    #         api_key=api_key,
-    #         api_version="2024-10-01-preview",
-    #     )
-
-    #     messages = [
-    #         {
-    #             "role": "system",
-    #             "content": "You are an expert in trademark law and semantics.",
-    #         },
-    #         {"role": "user", "content": prompt},
-    #     ]
-
-    #     response = client.chat.completions.create(
-    #         model="gpt-4o-mini",
-    #         messages=messages,
-    #         temperature=0.0,
-    #         max_tokens=5,
-    #     )
-
-    #     answer = response.choices[0].message.content.strip().lower()
-    #     return "yes" in answer.lower()
-
-    # def is_phonetically_equivalents(
-    #     name1: str, name2: str, threshold: int = 80
-    # ) -> bool:
-    #     from metaphone import doublemetaphone
-
-    #     dm_name1 = doublemetaphone(name1)
-    #     dm_name2 = doublemetaphone(name2)
-    #     phonetic_similarity = fuzz.ratio(dm_name1[0], dm_name2[0])
-    #     if phonetic_similarity >= threshold:
-    #         return True
-    #     elif phonetic_similarity >= (threshold - 10):
-    #         # Near-threshold case, supplement with LLM
-    #         return is_phonetically_equivalent_llm(name1, name2)
-    #     else:
-    #         return False
-
-    # def is_phonetically_equivalent_llm(name1: str, name2: str) -> bool:
-
-    #     prompt = f"""  
-    #     Do the following two trademark names sound the same or very similar when spoken aloud? Consider differences in spelling but similarities in pronunciation. Respond with 'Yes' or 'No'.  
-        
-    #     Trademark Name 1: "{name1}"  
-    #     Trademark Name 2: "{name2}"  
-    #     """
-
-    #     messages = [
-    #         {
-    #             "role": "system",
-    #             "content": "You are an expert in phonetics and trademark law.",
-    #         },
-    #         {"role": "user", "content": prompt},
-    #     ]
-
-    #     azure_endpoint = os.getenv("AZURE_ENDPOINT")
-    #     api_key = os.getenv("AZURE_API_KEY")
-    #     client = AzureOpenAI(
-    #         azure_endpoint=azure_endpoint,
-    #         api_key=api_key,
-    #         api_version="2024-10-01-preview",
-    #     )
-
-    #     response = client.chat.completions.create(
-    #         model="gpt-4o-mini",
-    #         messages=messages,
-    #         temperature=0.0,
-    #         max_tokens=5,
-    #     )
-
-    #     answer = response.choices[0].message.content.strip().lower()
-    #     return "yes" in answer.lower()
-
+   
     # Condition 1A: Exact character-for-character match
     condition_1A_satisfied = (
         existing_trademark["trademark_name"].strip().lower()
@@ -779,56 +593,7 @@ def compare_trademarks(
         ]
     )
 
-    # def target_market_and_goods_overlaps(existing_gs, proposed_gs, threshold=0.65):
-    #     embeddings1 = semantic_model.encode(existing_gs, convert_to_tensor=True)
-    #     embeddings2 = semantic_model.encode(proposed_gs, convert_to_tensor=True)
-    #     similarity_score = util.cos_sim(embeddings1, embeddings2).item()
-    #     if similarity_score >= threshold:
-    #         return True
-    #     elif similarity_score >= (threshold - 0.1):
-    #         # Supplement with LLM
-    #         return target_market_and_goods_overlap_llm(existing_gs, proposed_gs)
-    #     else:
-    #         # Further check using keyword overlap
-    #         # ... Additional code
-    #         return False
-
-    # def target_market_and_goods_overlap_llm(existing_gs: str, proposed_gs: str) -> bool:
-    #     prompt = f"""  
-    #         Do the goods and services described in the existing trademark and the proposed trademark overlap or target the same market? Consider the descriptions carefully. Respond with 'Yes' or 'No'.  
-            
-    #         Existing Trademark Goods/Services:  
-    #         "{existing_gs}"  
-            
-    #         Proposed Trademark Goods/Services:  
-    #         "{proposed_gs}"  
-    #         """
-
-    #     messages = [
-    #         {
-    #             "role": "system",
-    #             "content": "You are an expert in trademark law and market analysis.",
-    #         },
-    #         {"role": "user", "content": prompt},
-    #     ]
-
-    #     azure_endpoint = os.getenv("AZURE_ENDPOINT")
-    #     api_key = os.getenv("AZURE_API_KEY")
-    #     client = AzureOpenAI(
-    #         azure_endpoint=azure_endpoint,
-    #         api_key=api_key,
-    #         api_version="2024-10-01-preview",
-    #     )
-
-    #     response = client.chat.completions.create(
-    #         model="gpt-4o-mini",
-    #         messages=messages,
-    #         temperature=0.0,
-    #         max_tokens=5,
-    #     )
-
-    #     answer = response.choices[0].message.content.strip().lower()
-    #     return "yes" in answer.lower()
+    
 
     # Condition 2: Overlap in International Class Numbers
     condition_2_satisfied = bool(
@@ -904,17 +669,7 @@ def compare_trademarks(
         existing_trademark["goods_services"], proposed_goods_services
     )
 
-    # condition_1A_satisfieds = is_exact_match(existing_trademark['trademark_name'].strip().lower(), proposed_name.strip().lower())
-    # st.write(f"Exact Match: {condition_1A_satisfieds}")
-
-    # condition_1B_satisfieds = is_semantically_equivalents(existing_trademark['trademark_name'].strip().lower(), proposed_name.strip().lower())
-    # st.write(f"Semantically equivalents : {condition_1B_satisfieds}")
-
-    # condition_1C_satisfieds = is_phonetically_equivalents(existing_trademark['trademark_name'], proposed_name)
-    # st.write(f"Phonetically equivalents : {condition_1C_satisfieds}")
-
-    # condition_3_satisfieds = target_market_and_goods_overlaps(existing_trademark['goods_services'], proposed_goods_services)
-    # st.write(f"Goods and services match's : {condition_3_satisfieds}")
+    
 
     # Clean and standardize the trademark status
     status = existing_trademark["status"].strip().lower()
